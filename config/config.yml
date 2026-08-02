@@ -1,0 +1,11 @@
+agent:
+  id: ignotec-lab
+  environment: laboratory
+  owner: ignotec
+  version: 1.0.0
+
+collector:
+  interval: 12h
+
+reports:
+  history_days: 90

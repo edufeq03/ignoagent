@@ -1,0 +1,73 @@
+"""Agent core orchestrator module.
+
+Coordinates metrics collection, vulnerability analysis, report compilation, and output persistence.
+"""
+
+import platform
+import socket
+from datetime import datetime
+from typing import Dict, Any
+
+from ignoagent.analyzers.network import analyze_ports
+from ignoagent.analyzers.risk import analyze as analyze_risk
+from ignoagent.collectors.hardening import collect as collect_hardening
+from ignoagent.collectors.security import collect as collect_security
+from ignoagent.collectors.services import collect as collect_services
+from ignoagent.collectors.system import collect as collect_system
+from ignoagent.outputs.file import save_history, save_status
+from ignoagent.outputs.sender import send
+from ignoagent.utils.config import load_config, load_identity
+from ignoagent.utils.heartbeat import create_heartbeat
+from ignoagent.utils.identity import get_instance_id
+from ignoagent.utils.logger import logger
+
+
+def generate_report() -> Dict[str, Any]:
+    """Orchestrates collectors and analyzers to compile and persist status report.
+
+    Returns:
+        Dict[str, Any]: Compiled report dictionary.
+    """
+    identity = load_identity()
+    config = load_config()
+
+    system_data = collect_system()
+    services_data = collect_services()
+    hardening_data = collect_hardening()
+    security_data = collect_security()
+
+    risk_analysis = analyze_risk(security_data)
+    network_analysis = analyze_ports(hardening_data.get("open_ports"))
+
+    agent_metadata = {**identity, "instance_id": get_instance_id()}
+
+    report = {
+        "agent": agent_metadata,
+        "heartbeat": create_heartbeat(),
+        "timestamp": datetime.now().isoformat(),
+        "server": {
+            "hostname": socket.gethostname(),
+            "os": platform.platform(),
+            "python": platform.python_version(),
+        },
+        "system": system_data,
+        "services": services_data,
+        "hardening": hardening_data,
+        "security": security_data,
+        "analysis": risk_analysis,
+        "network_analysis": network_analysis,
+    }
+
+    status_file = save_status(report)
+    history_file = save_history(report)
+    outbox_file = send(report)
+
+    logger.info("Enviado para fila Olivia: %s", outbox_file)
+    logger.info("Relatório criado: %s", status_file)
+    logger.info("Histórico salvo: %s", history_file)
+
+    return report
+
+
+if __name__ == "__main__":
+    generate_report()

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+BASE_DIR="/opt/ignoagent"
+
+cd "$BASE_DIR" || exit 1
+
+exec "$BASE_DIR/venv/bin/python" -m ignoagent

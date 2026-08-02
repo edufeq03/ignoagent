@@ -1,0 +1,12 @@
+[project]
+name = "ignoagent"
+version = "0.1.0"
+description = "Ignotec Infrastructure Agent"
+requires-python = ">=3.10"
+
+dependencies = [
+    "psutil",
+    "PyYAML",
+    "requests",
+    "packaging"
+]
