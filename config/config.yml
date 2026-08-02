@@ -2,7 +2,12 @@ agent:
   id: ignotec-lab
   environment: laboratory
   owner: ignotec
-  version: 1.0.0
+  version: 0.1.0
+
+api:
+  url: "http://localhost:8008/v1/reports"
+  token: "ignt_tok_lab_demo"
+  enabled: true
 
 collector:
   interval: 12h
