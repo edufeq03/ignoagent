@@ -67,10 +67,14 @@ def generate_report() -> Dict[str, Any]:
     outbox_file = send(report)
     outbox_dir = Path(outbox_file).parent
 
-    logger.info("✓ Status atualizado: %s", status_file)
-    logger.info("✓ Histórico registrado: %s", history_file)
-    logger.info("📦 Pasta Outbox: %s", outbox_dir)
-    logger.info("📄 Arquivo na Outbox: %s", outbox_file)
+    logger.info("====================================================================")
+    logger.info("IgnoAgent — Execução de Auditoria Concluída com Sucesso")
+    logger.info("====================================================================")
+    logger.info("Status atualizado:\n          -> %s", status_file)
+    logger.info("Histórico registrado:\n          -> %s", history_file)
+    logger.info("Pasta Outbox:\n          -> %s", outbox_dir)
+    logger.info("Arquivo na Outbox:\n          -> %s", outbox_file)
+    logger.info("====================================================================")
 
     return report
 

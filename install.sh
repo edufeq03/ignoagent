@@ -9,10 +9,11 @@ GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
+GRAY='\033[0;90m'
 NC='\033[0m' # No Color
 
 echo -e "${CYAN}====================================================================${NC}"
-echo -e "${CYAN}🚀 IgnoAgent — Instalador Autônomo & Agendador Systemd${NC}"
+echo -e "${CYAN}IgnoAgent — Instalador Autônomo & Agendador Systemd${NC}"
 echo -e "${CYAN}====================================================================${NC}"
 
 # 1. Verifica se está rodando como root/sudo
@@ -23,7 +24,8 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo -e "${GREEN}[✓] Diretório do IgnoAgent:${NC} ${INSTALL_DIR}"
+echo -e "${GREEN}[OK] Diretório do IgnoAgent:${NC}"
+echo -e "     ${GRAY}-> ${INSTALL_DIR}${NC}"
 
 # 2. Verifica dependências de sistema
 echo -e "${CYAN}[1/5] Verificando dependências de sistema...${NC}"
@@ -40,7 +42,7 @@ fi
 
 "${INSTALL_DIR}/venv/bin/pip" install --quiet --upgrade pip
 "${INSTALL_DIR}/venv/bin/pip" install --quiet -e "${INSTALL_DIR}"
-echo -e "${GREEN}[✓] Dependências Python instaladas com sucesso.${NC}"
+echo -e "${GREEN}[OK] Dependências Python instaladas com sucesso.${NC}"
 
 # 4. Garante arquivos de configuração Padrão
 echo -e "${CYAN}[3/5] Verificando arquivos de configuração...${NC}"
@@ -55,7 +57,7 @@ owner: ignotec
 installation_date: $(date +%Y-%m-%d)
 version: 1.0.0
 EOF
-    echo -e "${GREEN}[✓] Criado arquivo identity.yml padrão (${HOSTNAME_VAL}).${NC}"
+    echo -e "${GREEN}[OK] Criado arquivo identity.yml padrão (${HOSTNAME_VAL}).${NC}"
 fi
 
 # 5. Instala os serviços Systemd
@@ -102,12 +104,12 @@ systemctl daemon-reload
 systemctl enable --now ignoagent.timer
 
 echo -e "${CYAN}====================================================================${NC}"
-echo -e "${GREEN}🎉 IgnoAgent instalado e ativado com sucesso!${NC}"
+echo -e "${GREEN}[OK] IgnoAgent instalado e ativado com sucesso!${NC}"
 echo -e "${CYAN}====================================================================${NC}"
-echo -e "📌 STATUS DO TIMER:"
+echo -e "${CYAN}STATUS DO TIMER:${NC}"
 systemctl status ignoagent.timer --no-pager | head -n 10 || true
 echo -e ""
-echo -e "💡 COMANDOS ÚTEIS:"
+echo -e "${CYAN}COMANDOS ÚTEIS:${NC}"
 echo -e "  • Execução manual teste:  ${INSTALL_DIR}/venv/bin/python ${INSTALL_DIR}/run.py"
 echo -e "  • Ver logs do systemd:    sudo journalctl -u ignoagent -f"
 echo -e "  • Verificar agendamento:  sudo systemctl status ignoagent.timer"
