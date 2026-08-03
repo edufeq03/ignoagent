@@ -1,0 +1,11 @@
+[Unit]
+Description=IgnoAgent Periodic Execution Timer
+Requires=ignoagent.service
+
+[Timer]
+Unit=ignoagent.service
+OnCalendar=*:0/15
+Persistent=true
+
+[Install]
+WantedBy=timers.target

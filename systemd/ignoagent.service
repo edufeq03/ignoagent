@@ -1,0 +1,15 @@
+[Unit]
+Description=IgnoAgent Infrastructure Health & Security Audit Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/ignoagent
+ExecStart=/opt/ignoagent/venv/bin/python -m ignoagent
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
