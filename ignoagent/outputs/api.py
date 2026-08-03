@@ -1,7 +1,9 @@
 """Central API synchronization output handler."""
 
 import json
+from contextlib import contextmanager
 from pathlib import Path
+import socket
 from typing import Any, Dict, Optional
 import urllib.error
 import urllib.request
@@ -12,6 +14,26 @@ from ignoagent.utils.identity import get_instance_id
 from ignoagent.utils.logger import logger
 
 DEFAULT_API_URL = "http://localhost:8000/v1/reports"
+
+_original_getaddrinfo = socket.getaddrinfo
+
+
+def _ipv4_preferred_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    try:
+        res = _original_getaddrinfo(host, port, family, type, proto, flags)
+        res.sort(key=lambda x: 0 if x[0] == socket.AF_INET else 1)
+        return res
+    except Exception:
+        return _original_getaddrinfo(host, port, family, type, proto, flags)
+
+
+@contextmanager
+def prefer_ipv4():
+    socket.getaddrinfo = _ipv4_preferred_getaddrinfo
+    try:
+        yield
+    finally:
+        socket.getaddrinfo = _original_getaddrinfo
 
 
 def send_to_api(report: Dict[str, Any], api_url: Optional[str] = None, token: Optional[str] = None) -> bool:
@@ -51,13 +73,14 @@ def send_to_api(report: Dict[str, Any], api_url: Optional[str] = None, token: Op
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=10) as response:
-            if response.status in (200, 201, 202):
-                logger.info("Relatório enviado com sucesso para API Central (%s). HTTP %d", target_url, response.status)
-                return True
-            else:
-                logger.warning("API Central retornou status inesperado: HTTP %d", response.status)
-                return False
+        with prefer_ipv4():
+            with urllib.request.urlopen(req, timeout=10) as response:
+                if response.status in (200, 201, 202):
+                    logger.info("Relatório enviado com sucesso para API Central (%s). HTTP %d", target_url, response.status)
+                    return True
+                else:
+                    logger.warning("API Central retornou status inesperado: HTTP %d", response.status)
+                    return False
     except urllib.error.HTTPError as e:
         logger.error("Erro HTTP ao enviar relatório para API Central (%s): HTTP %d %s", target_url, e.code, e.reason)
         return False
