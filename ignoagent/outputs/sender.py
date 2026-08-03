@@ -20,6 +20,6 @@ def send(report: Dict[str, Any]) -> str:
     # Tenta sincronizar a fila do outbox com a API Central imediatamente
     sent_count = sync_outbox()
     if sent_count > 0:
-        logger.info("Transmitido(s) %d relatório(s) do outbox para a API Central.", sent_count)
+        logger.info("🚀 Transmitido(s) %d relatório(s) da pasta Outbox para a API Central com sucesso!", sent_count)
 
     return str(outbox_path)

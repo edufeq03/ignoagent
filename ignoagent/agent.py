@@ -9,6 +9,7 @@ import uuid
 from datetime import datetime
 from typing import Dict, Any
 
+from pathlib import Path
 from ignoagent.analyzers.network import analyze_ports
 from ignoagent.analyzers.risk import analyze as analyze_risk
 from ignoagent.collectors.hardening import collect as collect_hardening
@@ -64,10 +65,12 @@ def generate_report() -> Dict[str, Any]:
     status_file = save_status(report)
     history_file = save_history(report)
     outbox_file = send(report)
+    outbox_dir = Path(outbox_file).parent
 
-    logger.info("Enviado para fila Olivia: %s", outbox_file)
-    logger.info("Relatório criado: %s", status_file)
-    logger.info("Histórico salvo: %s", history_file)
+    logger.info("✓ Status atualizado: %s", status_file)
+    logger.info("✓ Histórico registrado: %s", history_file)
+    logger.info("📦 Pasta Outbox: %s", outbox_dir)
+    logger.info("📄 Arquivo na Outbox: %s", outbox_file)
 
     return report
 

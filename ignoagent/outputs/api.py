@@ -62,7 +62,13 @@ def send_to_api(report: Dict[str, Any], api_url: Optional[str] = None, token: Op
         logger.error("Erro HTTP ao enviar relatório para API Central (%s): HTTP %d %s", target_url, e.code, e.reason)
         return False
     except urllib.error.URLError as e:
-        logger.warning("API Central indisponível (%s): %s. Relatório mantido no outbox.", target_url, e.reason)
+        outbox_dir = get_base_path() / "reports" / "outbox"
+        logger.warning(
+            "⚠️ API Central indisponível (%s): %s. Relatório mantido na pasta outbox (%s).",
+            target_url,
+            e.reason,
+            outbox_dir
+        )
         return False
     except Exception as e:
         logger.error("Erro inesperado ao sincronizar com API Central: %s", str(e))
