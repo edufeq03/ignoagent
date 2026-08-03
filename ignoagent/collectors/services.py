@@ -32,7 +32,8 @@ def collect() -> Dict[str, Any]:
                 "--failed",
                 "--no-legend"
             ],
-            text=True
+            text=True,
+            timeout=2
         )
 
         if failed.strip():

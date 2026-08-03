@@ -59,6 +59,8 @@ def save_outbox(report: Dict[str, Any]) -> Path:
     Returns:
         Path: Saved outbox file path.
     """
-    filename = datetime.now().strftime("%Y-%m-%d_%H%M%S") + ".json"
+    report_id = report.get("report_id", "")
+    suffix = f"_{report_id[:8]}" if report_id else ""
+    filename = datetime.now().strftime("%Y-%m-%d_%H%M%S") + suffix + ".json"
     outbox_file = get_base_path() / "reports" / "outbox" / filename
     return save_json(report, outbox_file)

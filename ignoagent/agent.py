@@ -5,6 +5,7 @@ Coordinates metrics collection, vulnerability analysis, report compilation, and 
 
 import platform
 import socket
+import uuid
 from datetime import datetime
 from typing import Dict, Any
 
@@ -40,8 +41,10 @@ def generate_report() -> Dict[str, Any]:
     network_analysis = analyze_ports(hardening_data.get("open_ports"))
 
     agent_metadata = {**identity, "instance_id": get_instance_id()}
+    report_id = f"rep_{uuid.uuid4().hex}"
 
     report = {
+        "report_id": report_id,
         "agent": agent_metadata,
         "heartbeat": create_heartbeat(),
         "timestamp": datetime.now().isoformat(),

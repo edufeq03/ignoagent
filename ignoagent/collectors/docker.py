@@ -16,7 +16,8 @@ def collect() -> Union[List[str], Dict[str, Any]]:
     try:
         docker_output = subprocess.check_output(
             ["docker", "ps", "--format", "{{.Names}}"],
-            text=True
+            text=True,
+            timeout=2
         )
         return docker_output.splitlines()
     except Exception as e:

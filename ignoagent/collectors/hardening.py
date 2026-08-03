@@ -22,7 +22,8 @@ def run_command(command: str) -> Optional[str]:
             command,
             shell=True,
             text=True,
-            stderr=subprocess.DEVNULL
+            stderr=subprocess.DEVNULL,
+            timeout=2
         )
         return result.strip()
     except Exception:
@@ -38,8 +39,8 @@ def collect() -> Dict[str, Any]:
     """
     return {
         "kernel": platform.release(),
-        "firewall": run_command("sudo /usr/sbin/ufw status | head -5"),
+        "firewall": run_command("sudo -n /usr/sbin/ufw status 2>/dev/null | head -5"),
         "fail2ban": run_command("/usr/bin/systemctl is-active fail2ban"),
         "open_ports": run_command("/usr/bin/ss -tulpn | grep LISTEN"),
-        "updates": run_command("/usr/bin/apt list --upgradable 2>/dev/null | tail -n +2 | wc -l")
+        "updates": run_command("cat /var/lib/update-notifier/updates-available 2>/dev/null | grep -i 'packages' | head -1") or "0"
     }
