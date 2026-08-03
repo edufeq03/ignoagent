@@ -75,7 +75,7 @@ def send_to_api(report: Dict[str, Any], api_url: Optional[str] = None, token: Op
 
     try:
         with prefer_ipv4():
-            with urllib.request.urlopen(req, timeout=10) as response:
+            with urllib.request.urlopen(req, timeout=30) as response:
                 if response.status in (200, 201, 202):
                     logger.info("Relatório enviado com sucesso para API Central (%s). HTTP %d", target_url, response.status)
                     return True
