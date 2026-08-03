@@ -58,6 +58,7 @@ def send_to_api(report: Dict[str, Any], api_url: Optional[str] = None, token: Op
     payload_bytes = json.dumps(report, ensure_ascii=False).encode("utf-8")
 
     headers = {
+        "User-Agent": f"IgnoAgent/{agent_version} (Linux; x86_64)",
         "Content-Type": "application/json",
         "Authorization": f"Bearer {auth_token}",
         "X-Instance-ID": instance_id,
