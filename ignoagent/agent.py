@@ -41,7 +41,8 @@ def generate_report() -> Dict[str, Any]:
     risk_analysis = analyze_risk(security_data)
     network_analysis = analyze_ports(hardening_data.get("open_ports"))
 
-    agent_metadata = {**identity, "instance_id": get_instance_id()}
+    agent_cfg = config.get("agent", {})
+    agent_metadata = {**identity, **agent_cfg, "instance_id": get_instance_id()}
     report_id = f"rep_{uuid.uuid4().hex}"
 
     report = {
