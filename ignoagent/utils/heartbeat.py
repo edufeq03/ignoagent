@@ -1,6 +1,7 @@
 """Heartbeat generator utility."""
 
 from datetime import datetime, timezone
+from typing import Dict, Any
 
 
 def create_heartbeat() -> Dict[str, Any]:
