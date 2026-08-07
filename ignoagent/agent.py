@@ -6,7 +6,7 @@ Coordinates metrics collection, vulnerability analysis, report compilation, and 
 import platform
 import socket
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any
 
 from pathlib import Path
@@ -49,7 +49,7 @@ def generate_report() -> Dict[str, Any]:
         "report_id": report_id,
         "agent": agent_metadata,
         "heartbeat": create_heartbeat(),
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "server": {
             "hostname": socket.gethostname(),
             "os": platform.platform(),
