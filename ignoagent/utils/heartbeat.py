@@ -1,7 +1,6 @@
 """Heartbeat generator utility."""
 
-from datetime import datetime
-from typing import Dict, Any
+from datetime import datetime, timezone
 
 
 def create_heartbeat() -> Dict[str, Any]:
@@ -11,6 +10,6 @@ def create_heartbeat() -> Dict[str, Any]:
         Dict[str, Any]: Heartbeat containing timestamp and status.
     """
     return {
-        "last_execution": datetime.now().isoformat(),
+        "last_execution": datetime.now(timezone.utc).isoformat(),
         "status": "online"
     }
