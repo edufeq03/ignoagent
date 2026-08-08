@@ -20,9 +20,7 @@ _original_getaddrinfo = socket.getaddrinfo
 
 def _ipv4_preferred_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
     try:
-        res = _original_getaddrinfo(host, port, family, type, proto, flags)
-        res.sort(key=lambda x: 0 if x[0] == socket.AF_INET else 1)
-        return res
+        return _original_getaddrinfo(host, port, socket.AF_INET, type, proto, flags)
     except Exception:
         return _original_getaddrinfo(host, port, family, type, proto, flags)
 
