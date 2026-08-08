@@ -1,0 +1,17 @@
+agent:
+  id: "vps-hostname"
+  environment: "production"
+  owner: "ignotec"
+  version: "0.1.0"
+
+api:
+  url: "https://agent.ignotec.com.br/v1/reports"
+  token: "ignt_tok_SEU_TOKEN_AQUI"
+  enabled: true
+
+collector:
+  interval: 15m
+  timeout: 5
+
+reports:
+  history_days: 90

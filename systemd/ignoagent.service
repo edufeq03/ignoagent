@@ -8,6 +8,11 @@ Type=oneshot
 User=root
 WorkingDirectory=/opt/ignoagent
 ExecStart=/opt/ignoagent/venv/bin/python -m ignoagent
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/ignoagent/reports /opt/ignoagent/logs /opt/ignoagent/config
 StandardOutput=journal
 StandardError=journal
 

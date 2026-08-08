@@ -60,8 +60,17 @@ def save_json(data: Any, path: Union[str, Path], indent: int = 4) -> Path:
     """
     file_path = Path(path)
     file_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        file_path.parent.chmod(0o700)
+    except OSError:
+        pass
 
     with open(file_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=indent, default=json_serializer, ensure_ascii=False)
+
+    try:
+        file_path.chmod(0o600)
+    except OSError:
+        pass
 
     return file_path

@@ -34,6 +34,9 @@ def prefer_ipv4():
         socket.getaddrinfo = _original_getaddrinfo
 
 
+import platform
+import urllib.parse
+
 def send_to_api(report: Dict[str, Any], api_url: Optional[str] = None, token: Optional[str] = None) -> bool:
     """Sends a single report payload to the Central API endpoint.
 
@@ -47,16 +50,34 @@ def send_to_api(report: Dict[str, Any], api_url: Optional[str] = None, token: Op
     """
     config = load_config()
     target_url = api_url or config.get("api", {}).get("url", DEFAULT_API_URL)
-    auth_token = token or config.get("api", {}).get("token", "ignt_tok_default")
+    auth_token = token or config.get("api", {}).get("token")
+
+    # 1. Validação estrita de token (Sem fallback hardcoded previsível)
+    if not auth_token:
+        logger.error("Falha de autenticação: Nenhum token de API configurado. Envio cancelado por segurança.")
+        return False
+
+    # 2. Validação de transporte seguro (Exigir HTTPS fora de localhost)
+    parsed_url = urllib.parse.urlparse(target_url)
+    hostname = parsed_url.hostname or ""
+    is_localhost = hostname in ("localhost", "127.0.0.1", "::1")
+
+    if parsed_url.scheme == "http" and not is_localhost:
+        logger.error(
+            "Risco Crítico de Segurança: Endpoint de API remoto (%s) não utiliza HTTPS criptografado. Envio recusado.",
+            target_url
+        )
+        return False
 
     agent_info = report.get("agent", {})
     instance_id = agent_info.get("instance_id") or get_instance_id()
     agent_version = agent_info.get("version", "0.1.0")
+    arch = platform.machine() or "x86_64"
 
     payload_bytes = json.dumps(report, ensure_ascii=False).encode("utf-8")
 
     headers = {
-        "User-Agent": f"IgnoAgent/{agent_version} (Linux; x86_64)",
+        "User-Agent": f"IgnoAgent/{agent_version} (Linux; {arch})",
         "Content-Type": "application/json",
         "Authorization": f"Bearer {auth_token}",
         "X-Instance-ID": instance_id,
@@ -97,13 +118,14 @@ def send_to_api(report: Dict[str, Any], api_url: Optional[str] = None, token: Op
         return False
 
 
-def sync_outbox(api_url: Optional[str] = None) -> int:
+def sync_outbox(api_url: Optional[str] = None, token: Optional[str] = None) -> int:
     """Scans reports/outbox/ directory and attempts to send pending reports to the Central API.
 
     Transmitted reports are deleted from the local outbox queue upon HTTP confirmation.
 
     Args:
         api_url (Optional[str]): API endpoint URL override.
+        token (Optional[str]): Optional Bearer token override.
 
     Returns:
         int: Count of successfully sent reports.
@@ -122,7 +144,7 @@ def sync_outbox(api_url: Optional[str] = None) -> int:
             with open(file_path, "r", encoding="utf-8") as f:
                 report_data = json.load(f)
 
-            if send_to_api(report_data, api_url=api_url):
+            if send_to_api(report_data, api_url=api_url, token=token):
                 file_path.unlink(missing_ok=True)
                 sent_count += 1
             else:

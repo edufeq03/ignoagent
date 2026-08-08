@@ -24,8 +24,11 @@ def cleanup_outbox():
             f.unlink()
 
 
+import os
+
 def test_outbox_offline_and_reconnection_e2e():
     """Validates the full offline outbox queueing and online synchronization workflow."""
+    os.environ["IGNOAGENT_API_TOKEN"] = "ignt_tok_test_e2e"
     cleanup_outbox()
     outbox_dir = get_base_path() / "reports" / "outbox"
 

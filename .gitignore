@@ -23,8 +23,11 @@ reports/outbox/
 # Logs
 logs/
 
-# Configuração por instância
+# Configuração e segredos por instância (não versionar credenciais reais)
+config/config.yml
+config/identity.yml
 config/instance_id
+!config/config.yml.example
 
 # Cache
 cache/

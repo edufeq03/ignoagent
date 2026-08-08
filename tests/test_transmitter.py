@@ -46,7 +46,7 @@ def test_send_to_api_success(mock_urlopen):
     mock_response.__enter__.return_value = mock_response
     mock_urlopen.return_value = mock_response
 
-    result = send_to_api(SAMPLE_REPORT, api_url="http://localhost:8000/v1/reports")
+    result = send_to_api(SAMPLE_REPORT, api_url="http://localhost:8000/v1/reports", token="ignt_tok_test")
     assert result is True
     assert mock_urlopen.called
 
@@ -61,7 +61,7 @@ def test_sync_outbox_success(mock_urlopen, tmp_path):
     outbox_file = save_outbox(SAMPLE_REPORT)
     assert outbox_file.exists()
 
-    sent = sync_outbox(api_url="http://localhost:8000/v1/reports")
+    sent = sync_outbox(api_url="http://localhost:8000/v1/reports", token="ignt_tok_test")
     assert sent >= 1
     # Confirma que o arquivo transmitido foi removido do outbox local
     assert not outbox_file.exists()

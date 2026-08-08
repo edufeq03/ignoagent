@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from typing import Dict, Any
 
 from pathlib import Path
+from ignoagent.analyzers.availability import analyze_availability
 from ignoagent.analyzers.network import analyze_ports
 from ignoagent.analyzers.risk import analyze as analyze_risk
 from ignoagent.collectors.hardening import collect as collect_hardening
@@ -39,7 +40,13 @@ def generate_report() -> Dict[str, Any]:
     security_data = collect_security()
 
     risk_analysis = analyze_risk(security_data)
+    availability_analysis = analyze_availability(services_data, system_data)
     network_analysis = analyze_ports(hardening_data.get("open_ports"))
+
+    # Integrar métricas de risco de disponibilidade ao relatório de análise
+    risk_analysis["risk_score"] += availability_analysis.get("risk_score", 0)
+    risk_analysis["alerts"].extend(availability_analysis.get("alerts", []))
+    risk_analysis["recommendations"].extend(availability_analysis.get("recommendations", []))
 
     agent_cfg = config.get("agent", {})
     agent_metadata = {**identity, **agent_cfg, "instance_id": get_instance_id()}
@@ -60,6 +67,7 @@ def generate_report() -> Dict[str, Any]:
         "hardening": hardening_data,
         "security": security_data,
         "analysis": risk_analysis,
+        "availability_analysis": availability_analysis,
         "network_analysis": network_analysis,
     }
 

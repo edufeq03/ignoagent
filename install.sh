@@ -77,6 +77,11 @@ Type=oneshot
 User=root
 WorkingDirectory=${INSTALL_DIR}
 ExecStart=${INSTALL_DIR}/venv/bin/python -m ignoagent
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=${INSTALL_DIR}/reports ${INSTALL_DIR}/logs ${INSTALL_DIR}/config
 StandardOutput=journal
 StandardError=journal
 

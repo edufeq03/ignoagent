@@ -7,19 +7,31 @@ import yaml
 from ignoagent.utils.filesystem import get_base_path
 
 
+import os
+
 def load_config() -> Dict[str, Any]:
-    """Loads application configuration from config/config.yml.
+    """Loads application configuration from config/config.yml or environment variables.
 
     Returns:
         Dict[str, Any]: Configuration dictionary.
     """
     config_file = get_base_path() / "config" / "config.yml"
-    if not config_file.exists():
-        return {}
+    data = {}
+    if config_file.exists():
+        with open(config_file, "r", encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
 
-    with open(config_file, "r", encoding="utf-8") as f:
-        data = yaml.safe_load(f)
-        return data or {}
+    # Environment variable overrides (Segurança & Doze Fatores)
+    if "api" not in data:
+        data["api"] = {}
+
+    if os.getenv("IGNOAGENT_API_TOKEN"):
+        data["api"]["token"] = os.getenv("IGNOAGENT_API_TOKEN")
+
+    if os.getenv("IGNOAGENT_API_URL"):
+        data["api"]["url"] = os.getenv("IGNOAGENT_API_URL")
+
+    return data
 
 
 def load_identity() -> Dict[str, Any]:

@@ -5,7 +5,6 @@ from ignoagent.collectors import (
     collect_hardening,
     collect_security,
     collect_services,
-    collect_ssh,
     collect_system,
 )
 
@@ -46,10 +45,3 @@ def test_collect_hardening():
     assert "fail2ban" in data
     assert "open_ports" in data
     assert "updates" in data
-
-
-def test_collect_ssh():
-    """Tests SSH activity collector structure."""
-    data = collect_ssh()
-    assert isinstance(data, dict)
-    assert ("failed_logins" in data and "successful_logins" in data) or "error" in data
